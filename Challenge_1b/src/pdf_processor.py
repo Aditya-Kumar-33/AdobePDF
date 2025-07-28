@@ -83,17 +83,28 @@ class PDFProcessor:
         if not line:
             return False
         
+        # Clean the line
+        line = line.strip()
+        if len(line) < 3:
+            return False
+        
         # Check for common header patterns
         header_indicators = [
-            line.isupper(),  # All caps
+            line.isupper() and len(line) > 3,  # All caps and meaningful length
             line.startswith('Chapter'),
             line.startswith('Section'),
             line.startswith('Part'),
-            len(line.split()) <= 8,  # Short titles
+            len(line.split()) <= 8 and len(line) > 10,  # Short but meaningful titles
             any(keyword in line.lower() for keyword in [
                 'guide', 'overview', 'introduction', 'summary',
-                'tips', 'tricks', 'instructions', 'steps'
-            ])
+                'tips', 'tricks', 'instructions', 'steps', 'recipe',
+                'ingredients', 'method', 'procedure', 'workflow',
+                'feature', 'tool', 'function', 'destination', 'activity'
+            ]),
+            # Check for title case patterns
+            (line[0].isupper() and line.count(' ') >= 1 and 
+             all(word[0].isupper() or word.lower() in ['a', 'an', 'the', 'and', 'or', 'of', 'in', 'on', 'at', 'to', 'for'] 
+                 for word in line.split()))
         ]
         
         return any(header_indicators)
