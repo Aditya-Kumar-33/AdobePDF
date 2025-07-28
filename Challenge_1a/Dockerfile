@@ -1,14 +1,17 @@
+# Use AMD64-compatible Python base image
 FROM --platform=linux/amd64 python:3.10
 
+# Set working directory inside container
 WORKDIR /app
 
-# Copy the processing script
+# Copy the processing script into the container
 COPY process_pdfs.py .
-# Copy the schema file into the image
-COPY sample_dataset/schema/output_schema.json sample_dataset/schema/output_schema.json
+
+# Copy the full schema directory to maintain structure
+COPY sample_dataset/schema /app/schema
 
 # Install required dependencies
-RUN pip install PyPDF2 jsonschema
+RUN pip install --no-cache-dir PyPDF2 jsonschema
 
-# Run the script
-CMD ["python", "process_pdfs.py"] 
+# Command to run the script when container starts
+CMD ["python", "process_pdfs.py"]
